@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banners - Admin Panel - Like Telecom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <%- include('_header') %>
+
+    <div class="flex">
+        <%- include('_sidebar', { page: 'banners' }) %>
+
+        <main class="flex-1 p-8">
+            <div class="mb-6 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-800">Banners</h1>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded" role="alert">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span><%= success %></span>
+                    </div>
+                </div>
+            <% } %>
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded" role="alert">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <span><%= error %></span>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Hero Slider Banners -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Hero Slider Banners</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Hero Slider Left Banner -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Hero Slider - Left Banner</h3>
+                        <% const heroLeftBanner = banners.find(b => b.type === 'hero-slider-left'); %>
+                        <% if (heroLeftBanner) { %>
+                            <div class="mb-4 border rounded p-4">
+                                <img src="<%= heroLeftBanner.photo %>" alt="Left Banner" class="w-full h-32 object-contain rounded mb-2">
+                                <form method="POST" action="/admin/banners/<%= heroLeftBanner._id %>/delete" class="inline">
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="return confirm('Delete this banner?')">
+                                        <i class="fas fa-trash mr-1"></i>Delete
+                                    </button>
+                                </form>
+                            </div>
+                        <% } %>
+                        <form method="POST" action="/admin/banners">
+                            <input type="hidden" name="type" value="hero-slider-left">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Image URL *</label>
+                                <input type="url" name="photo" value="<%= heroLeftBanner ? heroLeftBanner.photo : '' %>" required
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% if (heroLeftBanner && heroLeftBanner.url) { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url" value="<%= heroLeftBanner.url %>"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } else { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } %>
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="active" <%= heroLeftBanner ? (heroLeftBanner.active ? 'checked' : '') : 'checked' %> class="mr-2">
+                                    <span class="text-gray-700">Active</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full">
+                                <i class="fas fa-<%= heroLeftBanner ? 'save' : 'plus' %> mr-2"></i><%= heroLeftBanner ? 'Update' : 'Add' %> Left Banner
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Hero Slider Right Banner -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Hero Slider - Right Banner</h3>
+                        <% const heroRightBanner = banners.find(b => b.type === 'hero-slider-right'); %>
+                        <% if (heroRightBanner) { %>
+                            <div class="mb-4 border rounded p-4">
+                                <img src="<%= heroRightBanner.photo %>" alt="Right Banner" class="w-full h-32 object-contain rounded mb-2">
+                                <form method="POST" action="/admin/banners/<%= heroRightBanner._id %>/delete" class="inline">
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="return confirm('Delete this banner?')">
+                                        <i class="fas fa-trash mr-1"></i>Delete
+                                    </button>
+                                </form>
+                            </div>
+                        <% } %>
+                        <form method="POST" action="/admin/banners">
+                            <input type="hidden" name="type" value="hero-slider-right">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Image URL *</label>
+                                <input type="url" name="photo" value="<%= heroRightBanner ? heroRightBanner.photo : '' %>" required
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% if (heroRightBanner && heroRightBanner.url) { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url" value="<%= heroRightBanner.url %>"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } else { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } %>
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="active" <%= heroRightBanner ? (heroRightBanner.active ? 'checked' : '') : 'checked' %> class="mr-2">
+                                    <span class="text-gray-700">Active</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full">
+                                <i class="fas fa-<%= heroRightBanner ? 'save' : 'plus' %> mr-2"></i><%= heroRightBanner ? 'Update' : 'Add' %> Right Banner
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner Highlights Banners -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Banner Highlights Banners</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Banner Highlights Left Banner -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Banner Highlights - Left Banner</h3>
+                        <% const highlightsLeftBanner = banners.find(b => b.type === 'banner-highlights-left'); %>
+                        <% if (highlightsLeftBanner) { %>
+                            <div class="mb-4 border rounded p-4">
+                                <img src="<%= highlightsLeftBanner.photo %>" alt="Left Banner" class="w-full h-32 object-contain rounded mb-2">
+                                <form method="POST" action="/admin/banners/<%= highlightsLeftBanner._id %>/delete" class="inline">
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="return confirm('Delete this banner?')">
+                                        <i class="fas fa-trash mr-1"></i>Delete
+                                    </button>
+                                </form>
+                            </div>
+                        <% } %>
+                        <form method="POST" action="/admin/banners">
+                            <input type="hidden" name="type" value="banner-highlights-left">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Image URL *</label>
+                                <input type="url" name="photo" value="<%= highlightsLeftBanner ? highlightsLeftBanner.photo : '' %>" required
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% if (highlightsLeftBanner && highlightsLeftBanner.url) { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url" value="<%= highlightsLeftBanner.url %>"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } else { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } %>
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="active" <%= highlightsLeftBanner ? (highlightsLeftBanner.active ? 'checked' : '') : 'checked' %> class="mr-2">
+                                    <span class="text-gray-700">Active</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full">
+                                <i class="fas fa-<%= highlightsLeftBanner ? 'save' : 'plus' %> mr-2"></i><%= highlightsLeftBanner ? 'Update' : 'Add' %> Left Banner
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Banner Highlights Right Banner -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Banner Highlights - Right Banner</h3>
+                        <% const highlightsRightBanner = banners.find(b => b.type === 'banner-highlights-right'); %>
+                        <% if (highlightsRightBanner) { %>
+                            <div class="mb-4 border rounded p-4">
+                                <img src="<%= highlightsRightBanner.photo %>" alt="Right Banner" class="w-full h-32 object-contain rounded mb-2">
+                                <form method="POST" action="/admin/banners/<%= highlightsRightBanner._id %>/delete" class="inline">
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="return confirm('Delete this banner?')">
+                                        <i class="fas fa-trash mr-1"></i>Delete
+                                    </button>
+                                </form>
+                            </div>
+                        <% } %>
+                        <form method="POST" action="/admin/banners">
+                            <input type="hidden" name="type" value="banner-highlights-right">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Image URL *</label>
+                                <input type="url" name="photo" value="<%= highlightsRightBanner ? highlightsRightBanner.photo : '' %>" required
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% if (highlightsRightBanner && highlightsRightBanner.url) { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url" value="<%= highlightsRightBanner.url %>"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } else { %>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Link URL (Optional)</label>
+                                <input type="url" name="url"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <% } %>
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="active" <%= highlightsRightBanner ? (highlightsRightBanner.active ? 'checked' : '') : 'checked' %> class="mr-2">
+                                    <span class="text-gray-700">Active</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full">
+                                <i class="fas fa-<%= highlightsRightBanner ? 'save' : 'plus' %> mr-2"></i><%= highlightsRightBanner ? 'Update' : 'Add' %> Right Banner
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+

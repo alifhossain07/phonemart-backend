@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brands - Admin Panel - Like Telecom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <%- include('_header') %>
+
+    <div class="flex">
+        <%- include('_sidebar', { page: 'brands' }) %>
+
+        <main class="flex-1 p-8">
+            <div class="mb-6 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-800">Brands</h1>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Brand</h2>
+                    <form method="POST" action="/admin/brands">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Brand Name *</label>
+                            <input type="text" name="name" required
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Icon URL</label>
+                            <input type="url" name="icon"
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="mb-4">
+                            <input type="checkbox" name="selected" class="mr-2"> Show on Homepage
+                        </div>
+
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded w-full">
+                            <i class="fas fa-plus mr-2"></i>Add Brand
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">All Brands</h2>
+                    <div class="space-y-2">
+                        <% if (brands && brands.length > 0) { %>
+                            <% brands.forEach(brand => { %>
+                                <div class="flex items-center justify-between p-3 border rounded">
+                                    <div>
+                                        <div class="font-medium"><%= brand.name %></div>
+                                        <div class="text-sm text-gray-500"><%= brand.slug %></div>
+                                    </div>
+                                    <form method="POST" action="/admin/brands/<%= brand._id %>/delete" class="inline" onsubmit="return confirm('Are you sure?')">
+                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="text-gray-500 text-center">No brands found</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

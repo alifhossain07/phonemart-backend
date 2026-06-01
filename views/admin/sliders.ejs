@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliders - Admin Panel - Like Telecom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <%- include('_header') %>
+    <div class="flex">
+        <%- include('_sidebar', { page: 'sliders' }) %>
+        <main class="flex-1 p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Hero Sliders</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">Add New Slider</h2>
+                    <form method="POST" action="/admin/sliders">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Image URL *</label>
+                            <input type="url" name="photo" required class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Order</label>
+                            <input type="number" name="order" value="0" class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label><input type="checkbox" name="active" checked class="mr-2">Active</label>
+                        </div>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Slider</button>
+                    </form>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">All Sliders</h2>
+                    <div class="space-y-4">
+                        <% if (sliders && sliders.length > 0) { %>
+                            <% sliders.forEach(slider => { %>
+                                <div class="border rounded p-4 flex items-center justify-between">
+                                    <img src="<%= slider.photo %>" alt="Slider" class="w-24 h-16 object-cover rounded">
+                                    <form method="POST" action="/admin/sliders/<%= slider._id %>/delete" class="inline">
+                                        <button type="submit" onclick="return confirm('Delete?')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                    </form>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="text-gray-500">No sliders</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+

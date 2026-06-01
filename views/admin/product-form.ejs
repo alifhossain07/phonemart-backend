@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof product !== 'undefined' && product ? 'Edit Product' : 'New Product' %> - Admin Panel - Like Telecom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <%- include('_header') %>
+
+    <div class="flex">
+        <%- include('_sidebar', { page: 'products' }) %>
+
+        <main class="flex-1 p-8">
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-800"><%= typeof product !== 'undefined' && product ? 'Edit Product' : 'Add New Product' %></h1>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <form method="POST" action="<%= typeof product !== 'undefined' && product ? '/admin/products/' + product._id : '/admin/products' %>">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Product Name *</label>
+                            <input type="text" name="name" value="<%= typeof product !== 'undefined' && product ? product.name : '' %>" required
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Category</label>
+                            <select name="category_id" class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Category</option>
+                                <% if (typeof categories !== 'undefined' && categories) { %>
+                                    <% categories.forEach(cat => { %>
+                                        <option value="<%= cat._id %>" <%= typeof product !== 'undefined' && product && product.category_id && product.category_id.toString() === cat._id.toString() ? 'selected' : '' %>>
+                                            <%= cat.name %>
+                                        </option>
+                                    <% }); %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Base Price *</label>
+                            <input type="number" step="0.01" name="base_price" 
+                                   value="<%= typeof product !== 'undefined' && product ? (product.base_price || product.main_price || '') : '' %>" 
+                                   required
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">The original price of the product</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Discount Type</label>
+                            <select name="discount_type" id="discountType" 
+                                    class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onchange="toggleDiscountValue()">
+                                <option value="">No Discount</option>
+                                <option value="percentage" <%= typeof product !== 'undefined' && product && product.discount_type === 'percentage' ? 'selected' : '' %>>Percentage (%)</option>
+                                <option value="flat" <%= typeof product !== 'undefined' && product && product.discount_type === 'flat' ? 'selected' : '' %>>Flat Amount</option>
+                            </select>
+                        </div>
+
+                        <div id="discountValueContainer" style="display: none;">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Discount Value *</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" step="0.01" name="discount_value" 
+                                       value="<%= typeof product !== 'undefined' && product ? (product.discount_value || '') : '' %>"
+                                       class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <span id="discountUnit" class="text-gray-600 font-medium"></span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1" id="discountHelp"></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Current Stock *</label>
+                            <input type="number" name="current_stock" value="<%= typeof product !== 'undefined' && product ? product.current_stock : 0 %>" required
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Warranty Period (Months)</label>
+                            <input type="number" name="warranty_period" value="<%= typeof product !== 'undefined' && product ? (product.warranty_period || '') : '' %>"
+                                   placeholder="e.g., 12 for 1 year"
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Leave empty if product has no warranty</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Thumbnail Image URL</label>
+                            <input type="url" name="thumbnail_image" value="<%= typeof product !== 'undefined' && product ? product.thumbnail_image : '' %>"
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                            <textarea name="description" rows="4"
+                                      class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"><%= typeof product !== 'undefined' && product ? product.description : '' %></textarea>
+                        </div>
+
+                        <!-- Basic Specifications -->
+                        <div class="md:col-span-2 border-t pt-4 mt-4">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Basic Specifications</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Display</label>
+                                    <input type="text" name="basic_specs_display" 
+                                           value="<%= typeof product !== 'undefined' && product && product.basic_specs && product.basic_specs.display ? product.basic_specs.display : '' %>"
+                                           placeholder="e.g., 6.1&quot; Super Retina XDR OLED"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Processor</label>
+                                    <input type="text" name="basic_specs_processor" 
+                                           value="<%= typeof product !== 'undefined' && product && product.basic_specs && product.basic_specs.processor ? product.basic_specs.processor : '' %>"
+                                           placeholder="e.g., Apple A15 Bionic"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Battery</label>
+                                    <input type="text" name="basic_specs_battery" 
+                                           value="<%= typeof product !== 'undefined' && product && product.basic_specs && product.basic_specs.battery ? product.basic_specs.battery : '' %>"
+                                           placeholder="e.g., 3240 mAh, fast &amp; wireless charging"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Camera</label>
+                                    <input type="text" name="basic_specs_camera" 
+                                           value="<%= typeof product !== 'undefined' && product && product.basic_specs && product.basic_specs.camera ? product.basic_specs.camera : '' %>"
+                                           placeholder="e.g., Dual 12 MP, night mode, Cinematic video"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Others</label>
+                                    <input type="text" name="basic_specs_others" 
+                                           value="<%= typeof product !== 'undefined' && product && product.basic_specs && product.basic_specs.others ? product.basic_specs.others : '' %>"
+                                           placeholder="e.g., 5G, IP68 water-resistan"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colors -->
+                        <div class="md:col-span-2 border-t pt-4 mt-4">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Colors (Hex codes, comma-separated)</h3>
+                            <input type="text" name="colors" 
+                                   value="<%= typeof product !== 'undefined' && product && product.colors ? product.colors.join(', ') : '' %>"
+                                   placeholder="e.g., #9966CC, #7FFFD4, #000000"
+                                   class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Enter hex color codes separated by commas</p>
+                        </div>
+
+                        <!-- Choice Options (Storage & Region) -->
+                        <div class="md:col-span-2 border-t pt-4 mt-4">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Choice Options</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Storage Options (comma-separated)</label>
+                                    <input type="text" name="storage_options" 
+                                           value="<%= typeof product !== 'undefined' && product && product.choice_options ? (product.choice_options.find(c => c.title === 'Storage') ? product.choice_options.find(c => c.title === 'Storage').options.join(', ') : '') : '' %>"
+                                           placeholder="e.g., 128GB, 256GB, 512GB"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Region Options (comma-separated)</label>
+                                    <input type="text" name="region_options" 
+                                           value="<%= typeof product !== 'undefined' && product && product.choice_options ? (product.choice_options.find(c => c.title === 'Region') ? product.choice_options.find(c => c.title === 'Region').options.join(', ') : '') : '' %>"
+                                           placeholder="e.g., USA, China, International"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics -->
+                        <div class="md:col-span-2 border-t pt-4 mt-4">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Statistics</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Viewing Count</label>
+                                    <input type="number" name="viewing_count" 
+                                           value="<%= typeof product !== 'undefined' && product && product.viewing_count !== undefined ? product.viewing_count : '' %>"
+                                           placeholder="e.g., 105"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Units Sold (Last 4 Days)</label>
+                                    <input type="number" name="units_sold" 
+                                           value="<%= typeof product !== 'undefined' && product && product.units_sold !== undefined ? product.units_sold : '' %>"
+                                           placeholder="e.g., 20"
+                                           class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" name="featured" <%= typeof product !== 'undefined' && product && product.featured ? 'checked' : '' %> 
+                                   class="mr-2"> Featured Product
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" name="published" <%= typeof product !== 'undefined' && product && product.published ? 'checked' : '' %> 
+                                   class="mr-2"> Published
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex gap-4">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
+                            <i class="fas fa-save mr-2"></i>Save Product
+                        </button>
+                        <a href="/admin/products" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleDiscountValue() {
+            const discountType = document.getElementById('discountType').value;
+            const container = document.getElementById('discountValueContainer');
+            const unit = document.getElementById('discountUnit');
+            const help = document.getElementById('discountHelp');
+            const input = container.querySelector('input[name="discount_value"]');
+            
+            if (discountType === 'percentage') {
+                container.style.display = 'block';
+                unit.textContent = '%';
+                help.textContent = 'Enter discount percentage (e.g., 10 for 10% off)';
+                input.required = true;
+            } else if (discountType === 'flat') {
+                container.style.display = 'block';
+                unit.textContent = '৳';
+                help.textContent = 'Enter flat discount amount (e.g., 1000 for ৳1000 off)';
+                input.required = true;
+            } else {
+                container.style.display = 'none';
+                input.required = false;
+                input.value = '';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleDiscountValue();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupons - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <%- include('_header') %>
+    <div class="flex">
+        <%- include('_sidebar', { page: 'coupons' }) %>
+        <main class="flex-1 p-8">
+            <h1 class="text-3xl font-bold mb-6">Coupons</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">Create Coupon</h2>
+                    <form method="POST" action="/admin/coupons">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Code *</label>
+                            <input type="text" name="code" required class="w-full border rounded px-4 py-2 uppercase">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Type *</label>
+                            <select name="type" required class="w-full border rounded px-4 py-2">
+                                <option value="percentage">Percentage</option>
+                                <option value="flat">Flat Amount</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Discount *</label>
+                            <input type="number" name="discount" required step="0.01" class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Min Purchase</label>
+                            <input type="number" name="min_purchase" step="0.01" class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Max Discount (for percentage only)</label>
+                            <input type="number" name="max_discount" step="0.01" class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Start Date</label>
+                            <input type="datetime-local" name="start_date" class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">End Date</label>
+                            <input type="datetime-local" name="end_date" class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label><input type="checkbox" name="active" checked class="mr-2">Active</label>
+                        </div>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full">Create Coupon</button>
+                    </form>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">All Coupons</h2>
+                    <div class="space-y-3">
+                        <% if (coupons && coupons.length > 0) { %>
+                            <% coupons.forEach(coupon => { %>
+                                <div class="border rounded p-4 flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-bold"><%= coupon.code %></h3>
+                                        <p class="text-sm text-gray-600">
+                                            <%= coupon.type === 'percentage' ? coupon.discount + '%' : '৳' + coupon.discount %>
+                                            <% if (coupon.min_purchase) { %>
+                                                <span class="text-xs text-gray-500"> (Min: ৳<%= coupon.min_purchase.toLocaleString() %>)</span>
+                                            <% } %>
+                                            <% if (coupon.max_discount && coupon.type === 'percentage') { %>
+                                                <span class="text-xs text-gray-500"> (Max: ৳<%= coupon.max_discount.toLocaleString() %>)</span>
+                                            <% } %>
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            <%= coupon.active ? 'Active' : 'Inactive' %>
+                                            <% if (coupon.start_date && coupon.end_date) { %>
+                                                | <%= new Date(coupon.start_date).toLocaleDateString() %> - <%= new Date(coupon.end_date).toLocaleDateString() %>
+                                            <% } %>
+                                        </p>
+                                    </div>
+                                    <form method="POST" action="/admin/coupons/<%= coupon._id %>/delete" class="inline">
+                                        <button type="submit" onclick="return confirm('Delete?')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button>
+                                    </form>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="text-gray-500">No coupons</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warranty Claims - Admin Panel - Like Telecom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <%- include('_header') %>
+
+    <div class="flex">
+        <%- include('_sidebar', { page: 'warranty' }) %>
+
+        <main class="flex-1 p-8">
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Warranty Claims</h1>
+            </div>
+
+            <div class="bg-white rounded-lg shadow mb-6 p-4">
+                <form method="GET" action="/admin/warranty" class="flex gap-4">
+                    <select name="status" class="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All Claims</option>
+                        <option value="pending" <%= typeof status !== 'undefined' && status === 'pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="processing" <%= typeof status !== 'undefined' && status === 'processing' ? 'selected' : '' %>>Processing</option>
+                        <option value="approved" <%= typeof status !== 'undefined' && status === 'approved' ? 'selected' : '' %>>Approved</option>
+                        <option value="completed" <%= typeof status !== 'undefined' && status === 'completed' ? 'selected' : '' %>>Completed</option>
+                        <option value="rejected" <%= typeof status !== 'undefined' && status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                    </select>
+                    <button type="submit" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded">
+                        Filter
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days in Warranty</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <% if (warranties && warranties.length > 0) { %>
+                            <% warranties.forEach(warranty => { %>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <%= warranty.order_code %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900"><%= warranty.product_name %></div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900"><%= warranty.customer_name %></div>
+                                        <div class="text-sm text-gray-500"><%= warranty.customer_phone %></div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <%= warranty.days_in_warranty %> days
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= 
+                                            warranty.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                            warranty.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                                            warranty.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            warranty.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                            'bg-red-100 text-red-800'
+                                        %>">
+                                            <%= warranty.status %>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <%= new Date(warranty.created_at).toLocaleDateString() %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button onclick="viewWarrantyDetails('<%= warranty._id %>')" 
+                                                class="text-blue-600 hover:text-blue-800 p-1" 
+                                                title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">No warranty claims found</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <% if (pagination && pagination.last_page > 1) { %>
+                <div class="mt-4 flex justify-center">
+                    <div class="flex gap-2">
+                        <% for (let i = 1; i <= pagination.last_page; i++) { %>
+                            <a href="/admin/warranty?page=<%= i %>" 
+                               class="px-4 py-2 <%= pagination.current_page === i ? 'bg-blue-500 text-white' : 'bg-white text-gray-700' %> rounded hover:bg-blue-100">
+                                <%= i %>
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+        </main>
+    </div>
+
+    <!-- Warranty Details Modal -->
+    <div id="warrantyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800">Warranty Claim Details</h2>
+                <button onclick="closeWarrantyModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div id="warrantyModalContent" class="p-6">
+                <div class="flex justify-center items-center py-10">
+                    <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function viewWarrantyDetails(warrantyId) {
+            const modal = document.getElementById('warrantyModal');
+            const content = document.getElementById('warrantyModalContent');
+            
+            modal.classList.remove('hidden');
+            content.innerHTML = '<div class="flex justify-center items-center py-10"><div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div></div>';
+            
+            try {
+                const response = await fetch(`/admin/warranty/${warrantyId}`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const warranty = result.data;
+                    renderWarrantyDetails(warranty);
+                } else {
+                    content.innerHTML = '<div class="text-center py-10 text-red-500">Failed to load warranty details</div>';
+                }
+            } catch (error) {
+                console.error('Error fetching warranty details:', error);
+                content.innerHTML = '<div class="text-center py-10 text-red-500">Error loading warranty details</div>';
+            }
+        }
+        
+        function renderWarrantyDetails(warranty) {
+            const content = document.getElementById('warrantyModalContent');
+            
+            const statusColors = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'processing': 'bg-blue-100 text-blue-800',
+                'approved': 'bg-green-100 text-green-800',
+                'completed': 'bg-green-100 text-green-800',
+                'rejected': 'bg-red-100 text-red-800'
+            };
+            
+            const statusClass = statusColors[warranty.status] || 'bg-gray-100 text-gray-800';
+            
+            const estimatedReturnDate = warranty.estimated_return_date 
+                ? new Date(warranty.estimated_return_date).toLocaleDateString()
+                : 'Not set';
+            
+            content.innerHTML = `
+                <form method="POST" action="/admin/warranty/${warranty.id}/update" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">Claim Information</h3>
+                            <div class="space-y-2 text-sm">
+                                <div><span class="font-medium">Order Code:</span> <span class="text-gray-700">${warranty.order_code}</span></div>
+                                <div><span class="font-medium">Product:</span> <span class="text-gray-700">${warranty.product_name}</span></div>
+                                <div><span class="font-medium">Status:</span> 
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">
+                                        ${warranty.status.toUpperCase()}
+                                    </span>
+                                </div>
+                                <div><span class="font-medium">Days in Warranty:</span> <span class="text-gray-700">${warranty.days_in_warranty} days</span></div>
+                                <div><span class="font-medium">Created:</span> <span class="text-gray-700">${new Date(warranty.created_at).toLocaleString()}</span></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">Customer Information</h3>
+                            <div class="space-y-2 text-sm">
+                                <div><span class="font-medium">Name:</span> <span class="text-gray-700">${warranty.customer_name}</span></div>
+                                <div><span class="font-medium">Phone:</span> <span class="text-gray-700">${warranty.customer_phone}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2">Issue Description</h3>
+                        <p class="text-sm text-gray-700 bg-gray-50 p-4 rounded">${warranty.issue_description}</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Status *</label>
+                            <select name="status" required class="w-full border rounded px-4 py-2">
+                                <option value="pending" ${warranty.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="processing" ${warranty.status === 'processing' ? 'selected' : ''}>Processing</option>
+                                <option value="approved" ${warranty.status === 'approved' ? 'selected' : ''}>Approved</option>
+                                <option value="completed" ${warranty.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                <option value="rejected" ${warranty.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Estimated Days for Return</label>
+                            <input type="number" name="estimated_days" value="${warranty.estimated_days || ''}" 
+                                   placeholder="e.g., 7 for 7 days"
+                                   class="w-full border rounded px-4 py-2">
+                            <p class="text-xs text-gray-500 mt-1">Current estimated return: ${estimatedReturnDate}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Admin Notes</label>
+                            <textarea name="admin_notes" rows="3" 
+                                      placeholder="Add notes about this warranty claim..."
+                                      class="w-full border rounded px-4 py-2">${warranty.admin_notes || ''}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onclick="closeWarrantyModal()" 
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded">
+                            Update Warranty Claim
+                        </button>
+                    </div>
+                </form>
+            `;
+        }
+        
+        function closeWarrantyModal() {
+            document.getElementById('warrantyModal').classList.add('hidden');
+        }
+        
+        document.getElementById('warrantyModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeWarrantyModal();
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeWarrantyModal();
+            }
+        });
+    </script>
+</body>
+</html>
+

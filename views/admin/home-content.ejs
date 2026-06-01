@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Content - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <%- include('_header') %>
+    <div class="flex">
+        <%- include('_sidebar', { page: 'home-content' }) %>
+        <main class="flex-1 p-8">
+            <h1 class="text-3xl font-bold mb-6">Home Page Content</h1>
+            
+            <!-- Success/Error Messages -->
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded" role="alert">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span><%= success %></span>
+                    </div>
+                </div>
+            <% } %>
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded" role="alert">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <span><%= error %></span>
+                    </div>
+                </div>
+            <% } %>
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">Home Bottom Info (Authentic Products Layout)</h2>
+                    <form method="POST" action="/admin/home-content/info">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Title</label>
+                            <input type="text" name="title" value="<%= homeInfo.title || '' %>" class="w-full border rounded px-4 py-2" placeholder="Enter title">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Description/Paragraph</label>
+                            <textarea name="description" rows="6" class="w-full border rounded px-4 py-2" placeholder="Enter description or paragraph text"><%= homeInfo.description || '' %></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Image URL</label>
+                            <input type="url" name="image" value="<%= homeInfo.image || homeInfo.banner_image_one || '' %>" class="w-full border rounded px-4 py-2" placeholder="https://imgbb.com/... or direct image URL">
+                            <p class="text-xs text-gray-500 mt-1">Upload image to ImgBB and paste the direct image URL here</p>
+                        </div>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save Info</button>
+                    </form>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">Newsletter Banner</h2>
+                    <form method="POST" action="/admin/home-content/newsletter-banner">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Title *</label>
+                            <input type="text" name="title" value="<%= newsletterBanner.title || '' %>" required class="w-full border rounded px-4 py-2" placeholder="Enter newsletter banner title">
+                            <p class="text-xs text-gray-500 mt-1">Use *text* for underlined text (e.g., "Subscribe to *Newsletter*)</p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Subtitle (Optional)</label>
+                            <input type="text" name="subtitle" value="<%= newsletterBanner.subtitle || '' %>" class="w-full border rounded px-4 py-2" placeholder="Enter subtitle">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Background Image URL *</label>
+                            <input type="url" name="image" value="<%= newsletterBanner.image || '' %>" required class="w-full border rounded px-4 py-2" placeholder="https://imgbb.com/... or direct image URL">
+                            <p class="text-xs text-gray-500 mt-1">Upload image to ImgBB and paste the direct image URL here</p>
+                        </div>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save Newsletter Banner</button>
+                    </form>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">Smart Phone Brands Section</h2>
+                    <form method="POST" action="/admin/home-content/smartphone-brands">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Title</label>
+                            <input type="text" name="title" value="<%= smartphoneBrands.title || '' %>" class="w-full border rounded px-4 py-2" placeholder="Enter title">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Subtitle</label>
+                            <textarea name="subtitle" rows="4" class="w-full border rounded px-4 py-2" placeholder="Enter subtitle"><%= smartphoneBrands.subtitle || '' %></textarea>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">Note: Brand logos are automatically displayed from category icons</p>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save Smart Phone Brands</button>
+                    </form>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">Home Bottom SEO</h2>
+                    <form method="POST" action="/admin/home-content/seo">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">SEO Title</label>
+                            <input type="text" name="title" value="<%= homeSeo.title || '' %>" class="w-full border rounded px-4 py-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">SEO Description</label>
+                            <textarea name="description" class="w-full border rounded px-4 py-2"><%= homeSeo.description || '' %></textarea>
+                        </div>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save SEO</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+
